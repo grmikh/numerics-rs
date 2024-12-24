@@ -264,4 +264,30 @@ mod tests {
         let result = interpolator.interpolate(0.5);
         assert!(result < 1.0, "Expected a value < 1.0, got {}", result);
     }
+
+    #[test]
+    fn test_constant_interpolation_forward() {
+        let interp = Interpolator::new(
+            vec![0.0, 1.0, 2.0, 3.0],
+            vec![10.0, 20.0, 30.0, 40.0],
+            InterpolationType::ConstantForward,
+            ExtrapolationStrategy::Constant,
+        );
+        assert_eq!(interp.interpolate(0.5), 20.0); // Forward to next
+        assert_eq!(interp.interpolate(1.5), 30.0);
+        assert_eq!(interp.interpolate(2.5), 40.0);
+    }
+
+    #[test]
+    fn test_constant_interpolation_backward() {
+        let interp = Interpolator::new(
+            vec![0.0, 1.0, 2.0, 3.0],
+            vec![10.0, 20.0, 30.0, 40.0],
+            InterpolationType::ConstantBackward,
+            ExtrapolationStrategy::Constant,
+        );
+        assert_eq!(interp.interpolate(0.5), 10.0); // Backward to previous
+        assert_eq!(interp.interpolate(1.5), 20.0);
+        assert_eq!(interp.interpolate(2.5), 30.0);
+    }
 }
