@@ -6,6 +6,12 @@ description = "Blazing fast numerical library written in pure Rust"
 repository = "https://github.com/grmikh/numerics-rs"
 license = "MIT OR Apache-2.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+readme = "README.md"
+documentation = "https://docs.rs/numerics-rs"
+authors = [
+    "Grigory Mikheev <grigory.mikheev@gmail.com>",
+]
+keywords = ["solving", "interpolation", "spline", "root-finding"]
+categories = ["mathematics"]
 
 [dependencies]
