@@ -53,7 +53,7 @@ It comes with 0 external dependencies
 Everything in the API is immutable, thus it is safe to use in a multi-threaded environment
 
 ## How fast is it? 
-It is very fast and lightweight, it is using precomputed coefficients and it scales really well if you want to call it many times using the same set of knots.
+It is very fast and lightweight, it is using precomputed coefficients and it scales really well if you want to call it many times using the same set of knots. Benchmarks will be added in future versions
 
 ### Cargo
 
