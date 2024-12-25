@@ -5,7 +5,7 @@
 [![CI](https://github.com/grmikh/numerics-rs/workflows/CI/badge.svg)](https://github.com/grmikh/numerics-rs/actions)
 
 # About
-In order to learn Rust, I decided to create a project, inspired by the most common problems I have encountered working in finanial engineering. It is written in pure Rust and I strive for it to be the fastest existing implementation.
+In order to learn Rust, I decided to create a project inspired by the most common problems I have encountered working in finanial engineering. It is written in pure Rust and I strive for it to be the fastest existing implementation.
 Currently supports: 
 - Interpolation (Univariate, spline polynomials up to an order of 3)
 - Numerical solving (WIP)
@@ -46,6 +46,14 @@ Linear interpolation:
         assert_eq!(interpolator.interpolate(2.5), 5.0);
 ```
 
+## Dependencies
+It comes with 0 external dependencies
+
+## Thread safety
+Everything in the API is immutable, thus it is safe to use in a multi-threaded environment
+
+## How fast is it? 
+It is very fast and lightweight, it is using precomputed coefficients and it scales really well if you want to call it many times using the same set of knots.
 
 ### Cargo
 
@@ -71,3 +79,4 @@ for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
