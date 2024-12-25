@@ -45,6 +45,36 @@ Linear interpolation:
         assert_eq!(interpolator.interpolate(1.5), 3.0);
         assert_eq!(interpolator.interpolate(2.5), 5.0);
 ```
+## Supported modes
+### Interpolation
+#### Interpolation Types
+1. **Linear Interpolation**  
+   - Provides a straight-line transition between two points.  
+   - This method ensures smooth transitions without any sharp jumps between known values.  
+
+2. **Quadratic Interpolation**  
+   - Fits a quadratic function to each segment of the data.  
+   - Produces smoother transitions compared to linear interpolation, as it considers curvature.  
+
+3. **Cubic Interpolation**  
+   - Fits a cubic function to each segment of the data.  
+   - Delivers even smoother transitions by adjusting for changes in curvature and slopes.  
+
+4. **Constant (Stepwise) Interpolation**  
+   - Maintains a constant value between intervals, resulting in a step-like transition.  
+   - Supported modes:  
+     - **Constant Forward**: Uses the value of the next point in the interval.  
+     - **Constant Backward**: Uses the value of the previous point in the interval.  
+
+#### Extrapolation
+For inputs outside the range of the provided data, the library supports various extrapolation methods:
+
+1. **Linear Extrapolation**  
+   - Extends the trend of the data linearly based on the slope of the boundary points.  
+
+2. **Constant Extrapolation**  
+   - Maintains a constant value beyond the known points.  
+   - Similar to using a specific boundary value for all out-of-range inputs.  
 
 ## Dependencies
 It comes with 0 external dependencies
