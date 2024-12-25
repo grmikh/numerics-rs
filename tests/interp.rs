@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use numerics_rs::interp::{InterpolationType, Interpolator, ExtrapolationStrategy};
+    use numerics_rs::interp::{ExtrapolationStrategy, InterpolationType, Interpolator};
     const EPSILON: f64 = 1e-4;
     #[test]
     fn test_linear_interpolation_within_range() {
@@ -9,7 +9,12 @@ mod tests {
         let y_values = vec![0.0, 2.0, 4.0, 6.0];
 
         // Create an interpolator
-        let interpolator = Interpolator::new(x_values, y_values, InterpolationType::Linear, ExtrapolationStrategy::None);
+        let interpolator = Interpolator::new(
+            x_values,
+            y_values,
+            InterpolationType::Linear,
+            ExtrapolationStrategy::None,
+        );
 
         // Test linear interpolation at known points
         assert_eq!(interpolator.interpolate(0.0), 0.0);
@@ -30,7 +35,12 @@ mod tests {
         let y_values = vec![0.0, 1.0, 4.0];
 
         // Create an interpolator with no extrapolation
-        let interpolator = Interpolator::new(x_values, y_values, InterpolationType::Linear, ExtrapolationStrategy::None);
+        let interpolator = Interpolator::new(
+            x_values,
+            y_values,
+            InterpolationType::Linear,
+            ExtrapolationStrategy::None,
+        );
 
         // Interpolation for out-of-bounds value (this should panic)
         interpolator.interpolate(-1.0);
@@ -42,7 +52,12 @@ mod tests {
         let y_values = vec![0.0, 4.0, 8.0];
 
         // Create an interpolator with constant extrapolation strategy
-        let interpolator = Interpolator::new(x_values, y_values, InterpolationType::Linear, ExtrapolationStrategy::Constant);
+        let interpolator = Interpolator::new(
+            x_values,
+            y_values,
+            InterpolationType::Linear,
+            ExtrapolationStrategy::Constant,
+        );
 
         // Test extrapolation on the left side
         assert_eq!(interpolator.interpolate(-1.0), 0.0);
@@ -57,7 +72,12 @@ mod tests {
         let y_values = vec![0.0, 2.0, 4.0, 6.0];
 
         // Create an interpolator with ExtendSpline extrapolation strategy
-        let interpolator = Interpolator::new(x_values, y_values, InterpolationType::Linear, ExtrapolationStrategy::ExtendSpline);
+        let interpolator = Interpolator::new(
+            x_values,
+            y_values,
+            InterpolationType::Linear,
+            ExtrapolationStrategy::ExtendSpline,
+        );
         // Test extrapolation on the left side (linear slope: 2.0 from x[0])
         assert_eq!(interpolator.interpolate(-1.0), -2.0);
 
@@ -149,7 +169,10 @@ mod tests {
     fn test_cubic_interpolation_with_cubic_data() {
         // Test with cubic data y = x^3 - x^2 + 2x - 1
         let x_values: Vec<f64> = vec![0.0, 1.0, 2.0, 3.0, 4.0];
-        let y_values: Vec<f64> = x_values.iter().map(|&x| x.powi(3) - x.powi(2) + 2.0 * x - 1.0).collect();
+        let y_values: Vec<f64> = x_values
+            .iter()
+            .map(|&x| x.powi(3) - x.powi(2) + 2.0 * x - 1.0)
+            .collect();
         let interpolator = Interpolator::new(
             x_values,
             y_values,
@@ -160,11 +183,21 @@ mod tests {
         // Test interpolation within the range
         let result = interpolator.interpolate(2.5);
         let exp = 13.09821;
-        assert!((result - exp).abs() < EPSILON, "Expected {}, got {}", exp, result);
+        assert!(
+            (result - exp).abs() < EPSILON,
+            "Expected {}, got {}",
+            exp,
+            result
+        );
 
         let result = interpolator.interpolate(1.5);
         let exp = 3.2232;
-        assert!((result - exp).abs() < EPSILON, "Expected {}, got {}", exp, result);
+        assert!(
+            (result - exp).abs() < EPSILON,
+            "Expected {}, got {}",
+            exp,
+            result
+        );
 
         // Test with cubic data y = x^3
         let x_values: Vec<f64> = vec![0.0, 1.0, 2.0, 3.0, 4.0];
@@ -178,12 +211,21 @@ mod tests {
 
         let result = interpolator.interpolate(1.0);
         let exp = 1.0;
-        assert!((result - exp).abs() < EPSILON, "Expected {}, got {}", exp, result);
+        assert!(
+            (result - exp).abs() < EPSILON,
+            "Expected {}, got {}",
+            exp,
+            result
+        );
 
         let result = interpolator.interpolate(3.0);
         let exp = 27.0;
-        assert!((result - exp).abs() < EPSILON, "Expected {}, got {}", exp, result);
-
+        assert!(
+            (result - exp).abs() < EPSILON,
+            "Expected {}, got {}",
+            exp,
+            result
+        );
     }
 
     #[test]
@@ -200,10 +242,18 @@ mod tests {
 
         // Test interpolation within the range
         let result = interpolator.interpolate(3.0);
-        assert!(result > 1.0 && result < 3.5, "Unexpected result: {}", result);
+        assert!(
+            result > 1.0 && result < 3.5,
+            "Unexpected result: {}",
+            result
+        );
 
         let result = interpolator.interpolate(1.5);
-        assert!(result > 2.5 && result < 3.5, "Unexpected result: {}", result);
+        assert!(
+            result > 2.5 && result < 3.5,
+            "Unexpected result: {}",
+            result
+        );
     }
 
     #[test]
@@ -258,7 +308,11 @@ mod tests {
 
         // Test interpolation within range
         let result = interpolator.interpolate(1.5);
-        assert!((result - 4.5).abs() < EPSILON, "Expected 4.5, got {}", result);
+        assert!(
+            (result - 4.5).abs() < EPSILON,
+            "Expected 4.5, got {}",
+            result
+        );
 
         // Test extrapolation
         let result = interpolator.interpolate(0.5);

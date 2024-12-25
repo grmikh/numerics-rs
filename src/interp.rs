@@ -1,9 +1,9 @@
 /// Enum to define the type of interpolation
 #[derive(Debug)]
 pub enum InterpolationType {
-    Linear,          // Linear interpolation (order 1)
-    Quadratic,       // Quadratic spline interpolation (order 2)
-    Cubic,           // Cubic spline interpolation (order 3)
+    Linear,           // Linear interpolation (order 1)
+    Quadratic,        // Quadratic spline interpolation (order 2)
+    Cubic,            // Cubic spline interpolation (order 3)
     ConstantBackward, // Constant interpolation taking the previous value
     ConstantForward,  // Constant interpolation taking the next value
 }
@@ -11,8 +11,8 @@ pub enum InterpolationType {
 /// Enum to define the extrapolation strategy
 #[derive(Debug)]
 pub enum ExtrapolationStrategy {
-    None,       // Do not extrapolate, panic on out-of-bounds
-    Constant,   // Use the closest y-value for out-of-bounds x
+    None,         // Do not extrapolate, panic on out-of-bounds
+    Constant,     // Use the closest y-value for out-of-bounds x
     ExtendSpline, // Use the same spline function as interpolation
 }
 
@@ -36,11 +36,14 @@ impl Interpolator {
         extrap_strategy: ExtrapolationStrategy,
     ) -> Self {
         if x_values.len() != y_values.len() || x_values.len() < 2 {
-            panic!("x_values and y_values must have the same length and contain at least two points.");
+            panic!(
+                "x_values and y_values must have the same length and contain at least two points."
+            );
         }
 
         // Precompute spline coefficients
-        let (b_coeffs, c_coeffs, d_coeffs) = compute_spline_coefficients(&x_values, &y_values, &interpolation_type);
+        let (b_coeffs, c_coeffs, d_coeffs) =
+            compute_spline_coefficients(&x_values, &y_values, &interpolation_type);
         Self {
             x_values,
             y_values,
@@ -48,7 +51,7 @@ impl Interpolator {
             c_coeffs,
             d_coeffs,
             interpolation_type,
-            extrap_strategy
+            extrap_strategy,
         }
     }
 
@@ -59,16 +62,21 @@ impl Interpolator {
                 // We found where the value is bracketed
                 let dx = x - self.x_values[j];
                 return match self.interpolation_type {
-                    InterpolationType::Cubic | InterpolationType::Quadratic | InterpolationType::Linear => {
-                        self.y_values[j] + self.b_coeffs[j] * dx + self.c_coeffs[j] * dx.powi(2) + self.d_coeffs[j] * dx.powi(3)
+                    InterpolationType::Cubic
+                    | InterpolationType::Quadratic
+                    | InterpolationType::Linear => {
+                        self.y_values[j]
+                            + self.b_coeffs[j] * dx
+                            + self.c_coeffs[j] * dx.powi(2)
+                            + self.d_coeffs[j] * dx.powi(3)
                     }
-                    InterpolationType::ConstantBackward => { self.y_values[j] },
-                    InterpolationType::ConstantForward => { self.y_values[j + 1] },
-                }
+                    InterpolationType::ConstantBackward => self.y_values[j],
+                    InterpolationType::ConstantForward => self.y_values[j + 1],
+                };
             }
         }
         if x < *self.x_values.first().unwrap() || x > *self.x_values.last().unwrap() {
-            return self.extrapolate(x)
+            return self.extrapolate(x);
         }
         unreachable!("This could not be reached as the x is either bracketed or extrapolated");
     }
@@ -77,18 +85,28 @@ impl Interpolator {
     fn extrapolate(&self, x: f64) -> f64 {
         match self.extrap_strategy {
             ExtrapolationStrategy::None => {
-                panic!("Value x = {} is out of bounds and no extrapolation is enabled.", x);
+                panic!(
+                    "Value x = {} is out of bounds and no extrapolation is enabled.",
+                    x
+                );
             }
             ExtrapolationStrategy::Constant => {
                 if x < *self.x_values.first().unwrap() {
-                    return self.y_values.first().unwrap().clone();
+                    return *self.y_values.first().unwrap();
                 }
-                self.y_values.last().unwrap().clone()
+                *self.y_values.last().unwrap()
             }
             ExtrapolationStrategy::ExtendSpline => {
-                let j = if x < *self.x_values.first().unwrap() { 0 } else { self.x_values.len() - 2 };
+                let j = if x < *self.x_values.first().unwrap() {
+                    0
+                } else {
+                    self.x_values.len() - 2
+                };
                 let dx = x - self.x_values[j];
-                self.y_values[j] + self.b_coeffs[j] * dx + self.c_coeffs[j] * dx.powi(2) + self.d_coeffs[j] * dx.powi(3)
+                self.y_values[j]
+                    + self.b_coeffs[j] * dx
+                    + self.c_coeffs[j] * dx.powi(2)
+                    + self.d_coeffs[j] * dx.powi(3)
             }
         }
     }
@@ -100,8 +118,10 @@ fn compute_spline_coefficients(
     y: &[f64],
     interpolation_type: &InterpolationType,
 ) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
-    
-    if matches!(interpolation_type, InterpolationType::ConstantForward | InterpolationType::ConstantBackward) {
+    if matches!(
+        interpolation_type,
+        InterpolationType::ConstantForward | InterpolationType::ConstantBackward
+    ) {
         return (vec![], vec![], vec![]);
     }
 
@@ -109,7 +129,7 @@ fn compute_spline_coefficients(
     let dx: Vec<f64> = (0..n).map(|i| x[i + 1] - x[i]).collect(); // Spacing between x-values
     let dy: Vec<f64> = (0..n).map(|i| y[i + 1] - y[i]).collect(); // Spacing between y-values
     let slopes = (0..n).map(|i| dy[i] / dx[i]).collect();
-    
+
     match interpolation_type {
         InterpolationType::Linear => (slopes, vec![0.0; n], vec![0.0; n]),
         InterpolationType::Quadratic => {
@@ -120,11 +140,12 @@ fn compute_spline_coefficients(
             }
             c[n - 1] = 0.0; // Natural boundary at the last interval
             (slopes, c, vec![0.0; n])
-        },
+        }
         InterpolationType::Cubic => {
             let mut alpha = vec![0.0; n - 1];
             for i in 1..n {
-                alpha[i - 1] = 3.0 / dx[i] * (y[i + 1] - y[i]) - 3.0 / dx[i - 1] * (y[i] - y[i - 1]);
+                alpha[i - 1] =
+                    3.0 / dx[i] * (y[i + 1] - y[i]) - 3.0 / dx[i - 1] * (y[i] - y[i - 1]);
             }
             let mut b = vec![0.0; n];
             let mut c = vec![0.0; n + 1];
@@ -144,7 +165,10 @@ fn compute_spline_coefficients(
                 d[j] = (c[j + 1] - c[j]) / (3.0 * dx[j]);
             }
             (b, c, d)
-        },
-        _ => panic!("Interpolation type {:?} is not supported.", interpolation_type),
+        }
+        _ => panic!(
+            "Interpolation type {:?} is not supported.",
+            interpolation_type
+        ),
     }
 }
