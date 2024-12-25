@@ -9,7 +9,7 @@ In order to learn Rust, I decided to create a project inspired by the most commo
 Currently supports: 
 - Interpolation (Univariate, spline polynomials up to an order of 3)
 - Numerical solving (WIP)
-- Convenient matrix API and common matrix operations
+- Convenient matrix API and common matrix operations (WIP)
 
 ## Usage
 
