@@ -132,6 +132,7 @@ fn compute_spline_coefficients(
 
     match interpolation_type {
         InterpolationType::Linear => (slopes, vec![0.0; n], vec![0.0; n]),
+        // TODO: The code below could use more declarative way of solving equations, to be changed when I add matrix API
         InterpolationType::Quadratic => {
             let mut c = vec![0.0; n]; // Quadratic coefficients
 

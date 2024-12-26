@@ -9,11 +9,20 @@ In order to learn Rust, I decided to create a project inspired by the most commo
 Currently supports: 
 - Interpolation (Univariate, spline polynomials up to an order of 3)
 - Numerical solving (WIP)
-- Convenient matrix API and common matrix operations (WIP)
 
 ## Usage
 
-To use, add this to your crate:
+To use `numerics-rs`, first add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+numerics-rs = "0.1.0"
+```
+
+[dependencies]
+http = "1.0"
+
+And add this to your crate:
 
 ```rust
 use numerics_rs::interp::{InterpolationType, Interpolator, ExtrapolationStrategy};
@@ -49,16 +58,16 @@ Linear interpolation:
 ### Interpolation
 #### Interpolation Types
 1. **Linear Interpolation**  
-   - Provides a straight-line transition between two points.  
-   - This method ensures smooth transitions without any sharp jumps between known values.  
+   - Provides a straight-line transition between two points.
 
 2. **Quadratic Interpolation**  
    - Fits a quadratic function to each segment of the data.  
-   - Produces smoother transitions compared to linear interpolation, as it considers curvature.  
+   - NB! Please note that quadratic splines are very seldom used in practice and I certainly won't recommend anyone using it as it doesn't preserve the shape well, the best explanation I found is here: https://math.stackexchange.com/questions/4291501/why-it-is-not-possible-to-use-quadratic-spline
 
 3. **Cubic Interpolation**  
    - Fits a cubic function to each segment of the data.  
-   - Delivers even smoother transitions by adjusting for changes in curvature and slopes.  
+   - Delivers smooth transitions by adjusting for changes in curvature and slopes. It is using a 'Natural end condition'.
+   - This is the best description I found: https://blog.timodenk.com/cubic-spline-interpolation/
 
 4. **Constant (Stepwise) Interpolation**  
    - Maintains a constant value between intervals, resulting in a step-like transition.  
@@ -84,12 +93,6 @@ Everything in the API is immutable, thus it is safe to use in a multi-threaded e
 
 ## How fast is it? 
 It is very fast and lightweight, it is using precomputed coefficients and it scales really well if you want to call it many times using the same set of knots. Benchmarks will be added in future versions
-
-### Cargo
-
-* Install the rust toolchain in order to have cargo installed by following
-  [this](https://www.rust-lang.org/tools/install) guide.
-* run `cargo install numerics-rs`
 
 ## License
 

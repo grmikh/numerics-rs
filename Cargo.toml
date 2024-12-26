@@ -6,6 +6,10 @@ description = "Blazing fast numerical library written in pure Rust"
 repository = "https://github.com/grmikh/numerics-rs"
 license = "MIT OR Apache-2.0"
 
+[lib]
+name = "numerics-rs"
+path = "src/lib.rs"
+
 readme = "README.md"
 documentation = "https://docs.rs/numerics-rs"
 authors = [
