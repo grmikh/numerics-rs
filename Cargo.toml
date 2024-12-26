@@ -7,7 +7,7 @@ repository = "https://github.com/grmikh/numerics-rs"
 license = "MIT OR Apache-2.0"
 
 [lib]
-name = "numerics-rs"
+name = "numerics_rs"
 path = "src/lib.rs"
 
 readme = "README.md"
