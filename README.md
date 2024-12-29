@@ -21,10 +21,6 @@ To use `numerics-rs`, first add this to your `Cargo.toml`:
 [dependencies]
 numerics-rs = "0.1.0"
 ```
-
-[dependencies]
-http = "1.0"
-
 And add this to your crate:
 
 ```rust
@@ -33,29 +29,6 @@ use numerics_rs::interp::{InterpolationType, Interpolator, ExtrapolationStrategy
 fn main() {
     // ...
 }
-```
-
-## Examples
-
-Linear interpolation:
-
-```rust
-        let x_values = vec![0.0, 1.0, 2.0, 3.0];
-let y_values = vec![0.0, 2.0, 4.0, 6.0];
-
-// Create an interpolator
-let interpolator = Interpolator::new(x_values, y_values, InterpolationType::Linear, ExtrapolationStrategy::None);
-
-// Test linear interpolation at known points
-assert_eq!(interpolator.interpolate(0.0), 0.0);
-assert_eq!(interpolator.interpolate(1.0), 2.0);
-assert_eq!(interpolator.interpolate(2.0), 4.0);
-assert_eq!(interpolator.interpolate(3.0), 6.0);
-
-// Test linear interpolation between the points
-assert_eq!(interpolator.interpolate(0.5), 1.0);
-assert_eq!(interpolator.interpolate(1.5), 3.0);
-assert_eq!(interpolator.interpolate(2.5), 5.0);
 ```
 
 ## Supported modes
@@ -147,7 +120,28 @@ For inputs outside the range of the provided data, the library supports various 
 2. **Constant Extrapolation**
     - Maintains a constant value beyond the known points.
     - Similar to using a specific boundary value for all out-of-range inputs.
+## Examples
 
+Linear interpolation:
+
+```rust
+        let x_values = vec![0.0, 1.0, 2.0, 3.0];
+let y_values = vec![0.0, 2.0, 4.0, 6.0];
+
+// Create an interpolator
+let interpolator = Interpolator::new(x_values, y_values, InterpolationType::Linear, ExtrapolationStrategy::None);
+
+// Test linear interpolation at known points
+assert_eq!(interpolator.interpolate(0.0), 0.0);
+assert_eq!(interpolator.interpolate(1.0), 2.0);
+assert_eq!(interpolator.interpolate(2.0), 4.0);
+assert_eq!(interpolator.interpolate(3.0), 6.0);
+
+// Test linear interpolation between the points
+assert_eq!(interpolator.interpolate(0.5), 1.0);
+assert_eq!(interpolator.interpolate(1.5), 3.0);
+assert_eq!(interpolator.interpolate(2.5), 5.0);
+```
 ## Dependencies
 
 It comes with 0 external dependencies
