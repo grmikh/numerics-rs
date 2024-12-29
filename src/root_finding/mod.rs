@@ -26,8 +26,8 @@ pub trait RootFinder {
                 println!("Iteration {num_it}, args = {:#?}, vals = {:#?}", args, vals);
             }
             let should_stop: Option<Result<f64, String>> = self.should_stop(&num_it);
-            if should_stop.is_some() {
-                return should_stop.unwrap();
+            if let Some(res) = should_stop {
+                return res;
             }
             num_it += 1;
         }
@@ -48,7 +48,7 @@ pub struct NewtonRaphsonRootFinder<'a> {
     fx: f64,
     dfx: f64,
 }
-
+#[allow(clippy::needless_lifetimes)] // Clippy seems to have a bug here
 impl<'a> RootFinder for NewtonRaphsonRootFinder<'a> {
     type TArgs = f64;
     type TRes = (f64, f64);
