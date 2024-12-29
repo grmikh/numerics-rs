@@ -1,2 +1,2 @@
 pub mod interp;
-// mod root_finding;
+pub mod root_finding;
