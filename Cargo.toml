@@ -1,6 +1,6 @@
 [package]
 name = "numerics-rs"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "Blazing fast numerical library written in pure Rust"
 repository = "https://github.com/grmikh/numerics-rs"
