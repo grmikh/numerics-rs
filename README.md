@@ -21,6 +21,7 @@ To use `numerics-rs`, first add this to your `Cargo.toml`:
 [dependencies]
 numerics-rs = "0.1.0"
 ```
+
 And add this to your crate:
 
 ```rust
@@ -85,6 +86,44 @@ allows you to experiment and see how well the algorithm behaves on your data
     - The method will terminate either when the result meets the tolerance (`1e-6`) or after the maximum number of
       iterations (`100`).
 
+2. **Secant method**
+   Unlike the Newton-Raphson method, the Secant Method does not require the explicit calculation of the derivative of
+   the function, making it suitable for cases where the derivative is difficult or expensive to compute.
+   Instead of using the derivative, the Secant Method employs a finite difference approximation based on two initial
+   guesses that are close to the root. These two points are used to form a line (secant), and the root of this line is
+   used as the next approximation.
+
+   #### Example
+   Here's an example of using the secant method to find the root of the same quadratic function:
+
+   ```rust
+   use numerics_rs::solver::secant;
+
+   fn main() {
+       let function = |x: f64| x.powi(3) - x - 2.0; // f(x) = x³ - x - 2
+
+        // Create the builder and configure it for Secant method
+        let builder = RootFinderBuilder::new(RootFindingMethod::Secant)
+            .function(&function)
+            .boundaries(-400.0, 400.0) // Terrible initial guess on purpose
+            .tolerance(1e-6) // Convergence tolerance
+            .max_iterations(100) // Maximum iterations
+            .log_convergence(true); // Enable logging
+
+        // Build the root finder
+        let mut root_finder = builder.build().expect("Failed to build RootFinder");
+
+        let res = root_finder.find_root();
+        assert!((res.unwrap() - 1.5213797).abs() < 1e-6);
+   }
+   ```
+
+   In the above example:
+    - `function` is the target function `f(x)`.
+    - `boundaries` is the starting point for the iterations (left < right).
+    - The method will terminate either when the result meets the tolerance (`1e-6`) or after the maximum number of
+      iterations (`100`).
+
 ### Interpolation
 
 #### Interpolation Types
@@ -120,6 +159,7 @@ For inputs outside the range of the provided data, the library supports various 
 2. **Constant Extrapolation**
     - Maintains a constant value beyond the known points.
     - Similar to using a specific boundary value for all out-of-range inputs.
+
 ## Examples
 
 Linear interpolation:
@@ -142,6 +182,7 @@ assert_eq!(interpolator.interpolate(0.5), 1.0);
 assert_eq!(interpolator.interpolate(1.5), 3.0);
 assert_eq!(interpolator.interpolate(2.5), 5.0);
 ```
+
 ## Dependencies
 
 It comes with 0 external dependencies

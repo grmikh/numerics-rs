@@ -7,8 +7,8 @@ pub struct RootFinderBuilder<'a> {
     tolerance: Option<f64>,
     max_iterations: Option<usize>,
     log_convergence: Option<bool>,
-    function: Option<&'a dyn Fn(f64) -> f64>, // Target function
-    derivative: Option<&'a dyn Fn(f64) -> f64>, // Derivative of the target function
+    function: Option<&'a F>,   // Target function
+    derivative: Option<&'a F>, // Derivative of the target function
 }
 
 impl<'a> RootFinderBuilder<'a> {
@@ -57,13 +57,13 @@ impl<'a> RootFinderBuilder<'a> {
     }
 
     /// Sets the target function to be used by the root finder.
-    pub fn function(mut self, function: &'a dyn Fn(f64) -> f64) -> Self {
+    pub fn function(mut self, function: &'a F) -> Self {
         self.function = Some(function);
         self
     }
 
     /// Sets the derivative of the target function (required for Newton-Raphson).
-    pub fn derivative(mut self, derivative: &'a dyn Fn(f64) -> f64) -> Self {
+    pub fn derivative(mut self, derivative: &'a F) -> Self {
         self.derivative = Some(derivative);
         self
     }
@@ -79,18 +79,14 @@ impl<'a> RootFinderBuilder<'a> {
         // Validate the build configuration based on the selected method
         let rf: Result<Box<dyn RootFinder + 'a>, String> = match self.method {
             RootFindingMethod::NewtonRaphson => {
-                let derivative = self.derivative.ok_or("Derivative must be specified")?;
+                // let derivative = self.derivative.ok_or("Derivative must be specified")?;
                 let initial_guess = self
                     .initial_guess
                     .ok_or("Initial guess must be specified")?;
 
                 Ok(Box::new(newton_raphson::NewtonRaphsonRootFinder {
-                    function,
-                    derivative,
                     x0: initial_guess,
                     tolerance,
-                    fx: f64::NAN,
-                    dfx: f64::NAN,
                 }))
             }
             RootFindingMethod::Secant => {
@@ -99,19 +95,18 @@ impl<'a> RootFinderBuilder<'a> {
                     .ok_or("Derivative must be specified for Secant method.")?;
 
                 Ok(Box::new(secant::SecantRootFinder {
-                    function,
                     x0: boundaries.0,
                     x1: boundaries.1,
                     x2: f64::NAN,
                     tolerance,
-                    fx0: f64::NAN,
-                    fx1: f64::NAN,
                 }))
             }
             // Handle other methods if needed
             _ => Err("Unsupported method in this example.".to_string()),
         };
         Ok(RootFindingIterationDecorator::new(
+            function,
+            self.derivative,
             rf?,
             max_iterations,
             log_convergence,

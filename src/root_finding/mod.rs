@@ -14,8 +14,10 @@ pub enum RootFindingMethod {
     InverseQuadraticInterpolation,
     NewtonRaphson,
 }
-
+type F = dyn Fn(f64) -> f64;
 pub struct RootFindingIterationDecorator<'a> {
+    pub(super) function: &'a F,           // The target function f(x)
+    pub(super) derivative: Option<&'a F>, // The derivative f'(x)
     num_it: usize,
     max_iterations: usize,
     log_convergence: bool,
@@ -24,11 +26,15 @@ pub struct RootFindingIterationDecorator<'a> {
 
 impl<'a> RootFindingIterationDecorator<'a> {
     pub fn new(
+        function: &'a F,           // The target function f(x)
+        derivative: Option<&'a F>, // The derivative f'(x)
         root_finder: Box<dyn RootFinder + 'a>,
         max_iterations: usize,
         log_convergence: bool,
     ) -> Self {
         Self {
+            function,
+            derivative,
             num_it: 1,
             max_iterations,
             log_convergence,
@@ -40,15 +46,22 @@ impl<'a> RootFindingIterationDecorator<'a> {
         let rf = &mut self.root_finder;
         let mut args = rf.get_init_args();
         loop {
-            let vals = rf.evaluate();
+            let fx = args
+                .iter()
+                .map(|arg| (self.function)(*arg))
+                .collect::<Vec<_>>();
+            let mut dfx = vec![];
+            if self.derivative.is_some() {
+                dfx.extend(args.iter().map(|arg| self.derivative.unwrap()(*arg)));
+            }
             //TODO: Add time logging as well
             if self.log_convergence {
                 println!(
-                    "Iteration {}: args = {:?}, vals = {:?}",
-                    self.num_it, args, vals
+                    "Iteration {}: x = {:?}, fx = {:?}, dfx = {:?}",
+                    self.num_it, args, fx, dfx
                 );
             }
-            let should_stop: Option<Result<f64, String>> = rf.should_stop();
+            let should_stop: Option<Result<f64, String>> = rf.should_stop(&fx, &dfx);
             if let Some(res) = should_stop {
                 return res;
             }
@@ -56,14 +69,13 @@ impl<'a> RootFindingIterationDecorator<'a> {
                 return Err("Maximum iterations reached without convergence.".to_string());
             }
             self.num_it += 1;
-            args = rf.get_next_args();
+            args = rf.get_next_args(&fx, &dfx);
         }
     }
 }
 
 pub trait RootFinder {
-    fn evaluate(&mut self) -> (f64, f64);
-    fn get_init_args(&mut self) -> (f64, f64);
-    fn get_next_args(&mut self) -> (f64, f64);
-    fn should_stop(&self) -> Option<Result<f64, String>>;
+    fn get_init_args(&mut self) -> Box<[f64]>;
+    fn get_next_args(&mut self, fx: &[f64], dfx: &[f64]) -> Box<[f64]>;
+    fn should_stop(&self, fx: &[f64], dfx: &[f64]) -> Option<Result<f64, String>>;
 }

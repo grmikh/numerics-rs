@@ -28,7 +28,7 @@ mod tests {
         // Define the function and its derivative
         let function = |x: f64| x.powi(3) - x - 2.0; // f(x) = x³ - x - 2
 
-        // Create the builder and configure it for Newton-Raphson
+        // Create the builder and configure it for Secant method
         let builder = RootFinderBuilder::new(RootFindingMethod::Secant)
             .function(&function)
             .boundaries(-400.0, 400.0) // Terrible initial guess on purpose
@@ -36,7 +36,7 @@ mod tests {
             .max_iterations(100) // Maximum iterations
             .log_convergence(true); // Enable logging
 
-        // Build the Newton-Raphson root finder
+        // Build the root finder
         let mut root_finder = builder.build().expect("Failed to build RootFinder");
 
         let res = root_finder.find_root();
