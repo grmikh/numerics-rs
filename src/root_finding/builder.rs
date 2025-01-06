@@ -69,7 +69,7 @@ impl<'a> RootFinderBuilder<'a> {
     }
 
     /// Builds and returns the `RootFinder` instance.
-    pub fn build(self) -> Result<Box<dyn RootFinder + 'a>, String> {
+    pub fn build(self) -> Result<RootFindingIterationDecorator<'a>, String> {
         let function = self.function.ok_or("Function must be specified")?;
         let tolerance = self.tolerance.ok_or("Tolerance must be specified.")?;
         let max_iterations = self
@@ -77,7 +77,7 @@ impl<'a> RootFinderBuilder<'a> {
             .ok_or("Max iterations must be specified.")?;
         let log_convergence = self.log_convergence.unwrap_or(false);
         // Validate the build configuration based on the selected method
-        match self.method {
+        let rf: Result<Box<dyn RootFinder + 'a>, String> = match self.method {
             RootFindingMethod::NewtonRaphson => {
                 let derivative = self.derivative.ok_or("Derivative must be specified")?;
                 let initial_guess = self
@@ -89,8 +89,6 @@ impl<'a> RootFinderBuilder<'a> {
                     derivative,
                     x0: initial_guess,
                     tolerance,
-                    max_iterations,
-                    log_convergence,
                     fx: f64::NAN,
                     dfx: f64::NAN,
                 }))
@@ -106,14 +104,17 @@ impl<'a> RootFinderBuilder<'a> {
                     x1: boundaries.1,
                     x2: f64::NAN,
                     tolerance,
-                    max_iterations,
-                    log_convergence,
                     fx0: f64::NAN,
                     fx1: f64::NAN,
                 }))
             }
             // Handle other methods if needed
             _ => Err("Unsupported method in this example.".to_string()),
-        }
+        };
+        Ok(RootFindingIterationDecorator::new(
+            rf?,
+            max_iterations,
+            log_convergence,
+        ))
     }
 }
