@@ -101,6 +101,18 @@ impl<'a> RootFinderBuilder<'a> {
                     tolerance,
                 }))
             }
+            RootFindingMethod::Bisection => {
+                let boundaries = self
+                    .boundaries
+                    .ok_or("Derivative must be specified for Bisection method.")?;
+
+                Ok(Box::new(bisection::BisectionRootFinder {
+                    x0: boundaries.0,
+                    x1: boundaries.1,
+                    tolerance,
+                    search_left: true,
+                }))
+            }
             // Handle other methods if needed
             _ => Err("Unsupported method in this example.".to_string()),
         };

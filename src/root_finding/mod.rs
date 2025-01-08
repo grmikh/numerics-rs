@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+mod bisection;
 mod builder;
 mod newton_raphson;
 mod secant;
@@ -16,8 +17,8 @@ pub enum RootFindingMethod {
 }
 type F = dyn Fn(f64) -> f64;
 pub struct RootFindingIterationDecorator<'a> {
-    pub(super) function: &'a F,           // The target function f(x)
-    pub(super) derivative: Option<&'a F>, // The derivative f'(x)
+    function: &'a F,           // The target function f(x)
+    derivative: Option<&'a F>, // The derivative f'(x)
     num_it: usize,
     max_iterations: usize,
     log_convergence: bool,

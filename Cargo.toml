@@ -1,15 +1,10 @@
 [package]
 name = "numerics-rs"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 description = "Blazing fast numerical library written in pure Rust"
 repository = "https://github.com/grmikh/numerics-rs"
 license = "MIT OR Apache-2.0"
-
-[lib]
-name = "numerics_rs"
-path = "src/lib.rs"
-
 readme = "README.md"
 documentation = "https://docs.rs/numerics-rs"
 authors = [
@@ -18,4 +13,7 @@ authors = [
 keywords = ["solving", "interpolation", "spline", "root-finding"]
 categories = ["mathematics"]
 
-[dependencies]
+[lib]
+name = "numerics_rs"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]

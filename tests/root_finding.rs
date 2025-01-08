@@ -42,4 +42,25 @@ mod tests {
         let res = root_finder.find_root();
         assert!((res.unwrap() - 1.5213797).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_bisection() {
+        // Define the function and its derivative
+        let function = |x: f64| x.powi(3) - x - 2.0; // f(x) = x³ - x - 2
+
+        // Create the builder and configure it for Secant method
+        let builder = RootFinderBuilder::new(RootFindingMethod::Bisection)
+            .function(&function)
+            .boundaries(-400.0, 400.0) // Terrible initial guess on purpose
+            .tolerance(0.01) // Convergence tolerance
+            .max_iterations(100) // Maximum iterations
+            .log_convergence(true); // Enable logging
+
+        // Build the root finder
+        let mut root_finder = builder.build().expect("Failed to build RootFinder");
+
+        let res = root_finder.find_root();
+        let act = res.expect("Not converged");
+        assert!((act - 1.5213797).abs() < 0.01);
+    }
 }

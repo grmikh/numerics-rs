@@ -19,7 +19,7 @@ To use `numerics-rs`, first add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-numerics-rs = "0.1.0"
+numerics-rs = "1.0.2"
 ```
 
 And add this to your crate:
@@ -36,8 +36,8 @@ fn main() {
 
 ### Numerical solving
 
-Currently, supports only Newton-Raphson method but will be extended to secant method, bisection method and Brent method
-soon. It uses a Builder pattern to construct the solver. One of the coolest features is convergence logging - this
+Currently, supports only Newton-Raphson, Secant and Bisection methods. It uses a Builder pattern to construct the
+solver. One of the coolest features is convergence logging - this
 allows you to experiment and see how well the algorithm behaves on your data
 
 #### Supported modes
@@ -93,36 +93,11 @@ allows you to experiment and see how well the algorithm behaves on your data
    guesses that are close to the root. These two points are used to form a line (secant), and the root of this line is
    used as the next approximation.
 
-   #### Example
-   Here's an example of using the secant method to find the root of the same quadratic function:
-
-   ```rust
-   use numerics_rs::solver::secant;
-
-   fn main() {
-       let function = |x: f64| x.powi(3) - x - 2.0; // f(x) = x³ - x - 2
-
-        // Create the builder and configure it for Secant method
-        let builder = RootFinderBuilder::new(RootFindingMethod::Secant)
-            .function(&function)
-            .boundaries(-400.0, 400.0) // Terrible initial guess on purpose
-            .tolerance(1e-6) // Convergence tolerance
-            .max_iterations(100) // Maximum iterations
-            .log_convergence(true); // Enable logging
-
-        // Build the root finder
-        let mut root_finder = builder.build().expect("Failed to build RootFinder");
-
-        let res = root_finder.find_root();
-        assert!((res.unwrap() - 1.5213797).abs() < 1e-6);
-   }
-   ```
-
-   In the above example:
-    - `function` is the target function `f(x)`.
-    - `boundaries` is the starting point for the iterations (left < right).
-    - The method will terminate either when the result meets the tolerance (`1e-6`) or after the maximum number of
-      iterations (`100`).
+3. **Bisection method**
+   The Bisection Method is a simple and robust numerical technique for finding a root of a continuous function. It is
+   classified as a bracketing method, meaning it works by narrowing down an interval where the root is located. This
+   method requires that the function changes sign over the interval, ensuring the presence of a root due to the
+   Intermediate Value Theorem.
 
 ### Interpolation
 
