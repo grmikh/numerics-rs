@@ -11,7 +11,7 @@ finanial engineering. It is written in pure Rust and I strive for it to be the f
 Currently supports:
 
 - Interpolation (Univariate, spline polynomials up to an order of 3)
-- Numerical solving (WIP)
+- Numerical solving (Bisection method, Newton-Raphson method, Secant method, Brent method [WIP])
 
 ## Usage
 
