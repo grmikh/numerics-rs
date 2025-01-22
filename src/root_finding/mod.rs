@@ -1,11 +1,14 @@
 use std::fmt::Debug;
 
 mod bisection;
+mod brent;
 mod builder;
+mod convergencelog;
 mod newton_raphson;
 mod secant;
 
 pub use builder::RootFinderBuilder;
+pub use convergencelog::ConvergenceLog;
 
 #[derive(Debug)]
 pub enum RootFindingMethod {
@@ -16,6 +19,11 @@ pub enum RootFindingMethod {
     NewtonRaphson,
 }
 type F = dyn Fn(f64) -> f64;
+
+pub trait RootFindingIterator<'a> {
+    fn find_root(&mut self) -> Result<f64, String>;
+    fn get_convergence_log(&self) -> &ConvergenceLog;
+}
 pub struct RootFindingIterationDecorator<'a> {
     function: &'a F,           // The target function f(x)
     derivative: Option<&'a F>, // The derivative f'(x)
@@ -23,10 +31,11 @@ pub struct RootFindingIterationDecorator<'a> {
     max_iterations: usize,
     log_convergence: bool,
     root_finder: Box<dyn RootFinder + 'a>,
+    convergence_log: ConvergenceLog,
 }
 
 impl<'a> RootFindingIterationDecorator<'a> {
-    pub fn new(
+    fn new(
         function: &'a F,           // The target function f(x)
         derivative: Option<&'a F>, // The derivative f'(x)
         root_finder: Box<dyn RootFinder + 'a>,
@@ -40,10 +49,13 @@ impl<'a> RootFindingIterationDecorator<'a> {
             max_iterations,
             log_convergence,
             root_finder,
+            convergence_log: ConvergenceLog::new(),
         }
     }
-
-    pub fn find_root(&mut self) -> Result<f64, String> {
+}
+impl<'a> RootFindingIterator<'a> for RootFindingIterationDecorator<'a> {
+    fn find_root(&mut self) -> Result<f64, String> {
+        self.convergence_log.reset();
         let rf = &mut self.root_finder;
         let mut args = rf.get_init_args();
         loop {
@@ -57,10 +69,8 @@ impl<'a> RootFindingIterationDecorator<'a> {
             }
             //TODO: Add time logging as well
             if self.log_convergence {
-                println!(
-                    "Iteration {}: x = {:?}, fx = {:?}, dfx = {:?}",
-                    self.num_it, args, fx, dfx
-                );
+                self.convergence_log
+                    .add_entry(self.num_it, args, Box::from(&fx[..]));
             }
             let should_stop: Option<Result<f64, String>> = rf.should_stop(&fx, &dfx);
             if let Some(res) = should_stop {
@@ -72,6 +82,10 @@ impl<'a> RootFindingIterationDecorator<'a> {
             self.num_it += 1;
             args = rf.get_next_args(&fx, &dfx);
         }
+    }
+
+    fn get_convergence_log(&self) -> &ConvergenceLog {
+        &self.convergence_log
     }
 }
 

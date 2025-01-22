@@ -1,4 +1,5 @@
 use super::*;
+use crate::root_finding::brent::BrentRootFinder;
 /// Builder pattern for RootFinder configuration.
 pub struct RootFinderBuilder<'a> {
     method: RootFindingMethod,
@@ -69,7 +70,7 @@ impl<'a> RootFinderBuilder<'a> {
     }
 
     /// Builds and returns the `RootFinder` instance.
-    pub fn build(self) -> Result<RootFindingIterationDecorator<'a>, String> {
+    pub fn build(self) -> Result<Box<dyn RootFindingIterator<'a> + 'a>, String> {
         let function = self.function.ok_or("Function must be specified")?;
         let tolerance = self.tolerance.ok_or("Tolerance must be specified.")?;
         let max_iterations = self
@@ -77,7 +78,7 @@ impl<'a> RootFinderBuilder<'a> {
             .ok_or("Max iterations must be specified.")?;
         let log_convergence = self.log_convergence.unwrap_or(false);
         // Validate the build configuration based on the selected method
-        let rf: Result<Box<dyn RootFinder + 'a>, String> = match self.method {
+        let rf: Result<Box<dyn RootFinder>, &str> = match self.method {
             RootFindingMethod::NewtonRaphson => {
                 // let derivative = self.derivative.ok_or("Derivative must be specified")?;
                 let initial_guess = self
@@ -92,7 +93,7 @@ impl<'a> RootFinderBuilder<'a> {
             RootFindingMethod::Secant => {
                 let boundaries = self
                     .boundaries
-                    .ok_or("Derivative must be specified for Secant method.")?;
+                    .ok_or("Boundaries must be specified for Secant method.")?;
 
                 Ok(Box::new(secant::SecantRootFinder {
                     x0: boundaries.0,
@@ -104,7 +105,7 @@ impl<'a> RootFinderBuilder<'a> {
             RootFindingMethod::Bisection => {
                 let boundaries = self
                     .boundaries
-                    .ok_or("Derivative must be specified for Bisection method.")?;
+                    .ok_or("Boundaries must be specified for Bisection method.")?;
 
                 Ok(Box::new(bisection::BisectionRootFinder {
                     x0: boundaries.0,
@@ -114,14 +115,29 @@ impl<'a> RootFinderBuilder<'a> {
                 }))
             }
             // Handle other methods if needed
-            _ => Err("Unsupported method in this example.".to_string()),
+            _ => Err("Unsupported method in this example."),
         };
-        Ok(RootFindingIterationDecorator::new(
+        if let RootFindingMethod::Brent = self.method {
+            let boundaries = self
+                .boundaries
+                .ok_or("Boundaries must be specified for Brent method.")?;
+
+            return Ok(Box::new(BrentRootFinder {
+                x0: boundaries.0,
+                x1: boundaries.1,
+                tolerance,
+                function,
+                max_iterations,
+                log_convergence,
+                convergence_log: ConvergenceLog::new(),
+            }));
+        }
+        Ok(Box::new(RootFindingIterationDecorator::new(
             function,
             self.derivative,
             rf?,
             max_iterations,
             log_convergence,
-        ))
+        )))
     }
 }

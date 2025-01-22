@@ -10,7 +10,7 @@ documentation = "https://docs.rs/numerics-rs"
 authors = [
     "Grigory Mikheev <grigory.mikheev@gmail.com>",
 ]
-keywords = ["solving", "interpolation", "spline", "root-finding"]
+keywords = ["solving", "interpolation", "spline", "root-finding", "brent"]
 categories = ["mathematics"]
 
 [lib]
