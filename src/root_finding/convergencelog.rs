@@ -38,11 +38,8 @@ impl ConvergenceLog {
 
     /// Displays the convergence log in a readable format.
     pub fn display_log(&self) {
-        println!(
-            "{:<10} {:<30} {:<30} {:<15}",
-            "Iteration", "x", "f(x)", "Error"
-        );
-        println!("{:<10} {:<30} {:<30} {:<15}", "-", "-", "-", "-");
+        println!("{:<10} {:<30} {:<30}", "Iteration", "x", "f(x)");
+        println!("{:<10} {:<30} {:<30}", "-", "-", "-");
 
         for entry in &self.iterations {
             // Join x and f(x) values into comma-separated strings for display
