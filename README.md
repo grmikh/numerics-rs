@@ -11,7 +11,7 @@ finanial engineering. It is written in pure Rust and I strive for it to be the f
 Currently supports:
 
 - Interpolation (Univariate, spline polynomials up to an order of 3)
-- Numerical solving (Bisection method, Newton-Raphson method, Secant method, Brent method [WIP])
+- Numerical solving (Bisection method, Newton-Raphson method, Secant method, Brent method)
 
 ## Usage
 
@@ -98,6 +98,12 @@ allows you to experiment and see how well the algorithm behaves on your data
    classified as a bracketing method, meaning it works by narrowing down an interval where the root is located. This
    method requires that the function changes sign over the interval, ensuring the presence of a root due to the
    Intermediate Value Theorem.
+4. **Brent method**
+   Brent's Method is a hybrid root-finding algorithm that combines the robustness of the Bisection Method with the
+   efficiency of interpolation techniques (linear and quadratic). It provides both guaranteed convergence (like the
+   Bisection Method) and faster convergence rates when the function behaves nicely.
+   This method is particularly powerful because it dynamically chooses between bisection and interpolation based on the
+   situation, ensuring stability and efficiency. This is the recommended method in the majority of cases.
 
 ### Interpolation
 
